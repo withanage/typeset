@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE version SYSTEM "../../../lib/pkp/dtd/pluginVersion.dtd">
+
+<!--
+ * @file plugins/generic/heiMPT/version.xml
+ *
+ * Distributed under the GNU GPL v2.
+ *
+ * @brief plugin's information
+ *
+-->
+
+<version>
+		<application>heiMPT</application>
+		<type>plugins.generic</type>
+		<release>0.0.0.1</release>
+		<date>2019-09-01</date>
+		<lazy-load>1</lazy-load>
+		<class>HeiMPTPlugin</class>
+</version>
