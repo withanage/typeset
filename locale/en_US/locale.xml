@@ -9,6 +9,8 @@
 	<message key="plugins.generic.heiMPT.settings.description">Path to the commandline document conversion tool</message>
 	<message key="plugins.generic.heiMPT.settings.saved">Plugin settings saved</message>
 	<message key="plugins.generic.heiMPT.settings.title">Typesetting Tool Path</message>
+	<message key="plugins.generic.heiMPT.tool.ConversionError">Conversion error</message>
+	<message key="plugins.generic.heiMPT.tool.ConversionSuccess">Conversion successful</message>
 	<message key="plugins.generic.heiMPT.tool.PathNotFound">Tool path not found</message>
 
 </locale>
