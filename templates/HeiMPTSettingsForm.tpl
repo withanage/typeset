@@ -1,11 +1,8 @@
 {**
  * plugins/generic/heiMPT/templates/HeiMPTSettingsForm.tpl
  *
- * Copyright (c) 2013-2019 Simon Fraser University
- * Copyright (c) 2003-2019 John Willinsky
- * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
- *
- * Usage statistics plugin management form.
+
+ * Usage jeiMPT plugin management form.
  *
  *}
 <script type="text/javascript">
@@ -23,9 +20,11 @@
 	{fbvFormArea id="HeiMPTDisplayOptions" title="plugins.generic.heiMPT.settings.title"}
 
 		{fbvFormSection for="settingsDescription" description="plugins.generic.heiMPT.settings.description"}
-		{fbvElement type="text" id="heiMPTSettings" value=$heiMPTSettings size=$fbvStyles.size.SMALL}
-
+		{fbvElement type="text" id="toolPath" value=$toolPath size=$fbvStyles.size.LARGE inline=true required=true}
 		{/fbvFormSection}
+
+
+
 	{/fbvFormArea}
 	{fbvFormButtons id="HeiMPTFormSubmit" submitText="common.save" hideCancel=true}
 </form>

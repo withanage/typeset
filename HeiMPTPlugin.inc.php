@@ -8,6 +8,9 @@
 
 import('lib.pkp.classes.plugins.GenericPlugin');
 
+/**
+ * Class HeiMPTPlugin
+ */
 class HeiMPTPlugin extends GenericPlugin {
 
 	/**
@@ -32,14 +35,18 @@ class HeiMPTPlugin extends GenericPlugin {
 
 	//Callbacks
 
-
+	/**
+	 * @param $hookName
+	 * @param $args
+	 * @return bool
+	 */
 	public function callbackLoadHandler($hookName, $args) {
 		$page = $args[0];
 		$op = $args[1];
 
 		if ($page == "heiMPT" && $op == "convert") {
 			define('HANDLER_CLASS', 'HeiMPTHandler');
-			define('CONVERTER_PLUGIN_NAME', $this->getName());
+			define('TYPESET_PLUGIN_NAME', $this->getName());
 			$args[2] = $this->getPluginPath() . '/' . 'HeiMPTHandler.inc.php';
 		}
 
@@ -51,14 +58,14 @@ class HeiMPTPlugin extends GenericPlugin {
 	 * @param $hookName string The name of the invoked hook
 	 * @param $args array Hook parameters
 	 */
-	public function templateFetchCallback($hookName, $params) {
+	public function templateFetchCallback($hookName, $args) {
 		$request = $this->getRequest();
 		$dispatcher = $request->getDispatcher();
 
-		$templateMgr = $params[0];
-		$resourceName = $params[1];
+		$templateMgr = $args[0];
+		$resourceName = $args[1];
 		if ($resourceName == 'controllers/grid/gridRow.tpl') {
-			/* @var $row GridRow */
+
 			$row = $templateMgr->get_template_vars('row');
 			$data = $row->getData();
 
@@ -86,7 +93,7 @@ class HeiMPTPlugin extends GenericPlugin {
 					$linkAction = new LinkAction(
 						'parse',
 						new PostAndRedirectAction($path, $pathRedirect),
-						__('plugins.generic.heiMPT.button.parseDocx')
+						__('plugins.generic.heiMPT.button.createXML')
 					);
 					$row->addAction($linkAction);
 				}
@@ -116,21 +123,7 @@ class HeiMPTPlugin extends GenericPlugin {
 			parent::getActions($request, $actionArgs)
 		);
 	}
-	/**
-	 * Determine whether the plugin can be disabled.
-	 * @return boolean
-	 */
-	function getCanDisable() {
-		return true;
-	}
 
-	/**
-	 * Determine whether the plugin can be enabled.
-	 * @return boolean
-	 */
-	function getCanEnable() {
-		return true;
-	}
 	/**
 	 * @copydoc Plugin::getDisplayName()
 	 */
@@ -145,18 +138,6 @@ class HeiMPTPlugin extends GenericPlugin {
 		return __('plugins.generic.heiMPT.description');
 	}
 
-	/**
-	 * Determine whether the plugin is enabled.
-	 * @return boolean
-	 */
-	function getEnabled() {
-		$request = PKPApplication::getRequest();
-		if (!$request) return false;
-		$context = $request->getContext();
-		if (!$context) return false;
-		return $this->getSetting($context->getId(), 'enabled');
-	}
-
 
 	/**
 	 * Get plugin URL
@@ -167,6 +148,37 @@ class HeiMPTPlugin extends GenericPlugin {
 		return $request->getBaseUrl() . '/' . $this->getPluginPath();
 	}
 
+	/**
+	 * Get context wide setting. If the context or the setting does not exist,
+	 * get the site wide setting.
+	 * @param $context Context
+	 * @param $name Setting name
+	 * @return mixed
+	 */
+	function _getPluginSetting($context, $name) {
+		$pluginSettingsDao = DAORegistry::getDAO('PluginSettingsDAO');
+		if ($context && $pluginSettingsDao->settingExists($context->getId(), $this->getName(), $name)) {
+			return $this->getSetting($context->getId(), $name);
+		} else {
+			return $this->getSetting(CONTEXT_ID_NONE, $name);
+		}
+	}
+
+	/**
+	 * @param $request
+	 * @return mixed
+	 */
+	function getToolPath($request) {
+		$context = $request->getContext();
+		$toolPath = $this->_getPluginSetting($context, 'toolPath');
+		return $toolPath;
+	}
+
+	/**
+	 * @param array $args
+	 * @param PKPRequest $request
+	 * @return JSONMessage
+	 */
 	function manage($args, $request) {
 		$this->import('HeiMPTSettingsForm');
 		$context = Request::getContext();
@@ -179,14 +191,15 @@ class HeiMPTPlugin extends GenericPlugin {
 				$settingsForm = new HeiMPTForm($this, $context->getId());
 				$settingsForm->readInputData();
 				if ($settingsForm->validate()) {
-					$settingsForm->execute();
-					$notificationManager = new NotificationManager();
-					$notificationManager->createTrivialNotification(
-						$request->getUser()->getId(),
-						NOTIFICATION_TYPE_SUCCESS,
-						array('contents' => __('plugins.generic.wgl.settings.saved'))
-					);
-					return new JSONMessage(true);
+					if ($settingsForm->execute()) {
+						$notificationManager = new NotificationManager();
+						$notificationManager->createTrivialNotification(
+							$request->getUser()->getId(),
+							NOTIFICATION_TYPE_SUCCESS,
+							array('contents' => __('plugins.generic.heimpt.settings.saved'))
+						);
+						return new JSONMessage(true);
+					}
 				}
 				return new JSONMessage(true, $settingsForm->fetch($request));
 		}

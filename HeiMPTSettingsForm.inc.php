@@ -35,33 +35,62 @@ class HeiMPTForm extends Form
 		$plugin = $this->_plugin;
 		$context = Request::getContext();
 		$contextId = $context ? $context->getId() : CONTEXT_ID_NONE;
-		$heiMPT = $plugin->getSetting($contextId, 'heiMPT');
-		if (isset($heiMPT) & !empty($heiMPT)) {
-			$this->setData('heiMPT', $heiMPT);
+		$toolPath = $plugin->getSetting($contextId, 'toolPath');
+		if (isset($toolPath) & !empty($toolPath)) {
+			$this->setData('toolPath', $toolPath);
 		}
 		else {
-			$this->setData('heiMPT', '');
+			$this->setData('toolPath', '');
 		}
 	}
 
 	function readInputData()
 	{
-		$this->readUserVars(array('heiMPT'));
+		$this->readUserVars(array('toolPath'));
 	}
 
-
+	/**
+	 * @return
+	 */
 	function execute()
 	{
 		$plugin = $this->_plugin;
 		$context = Request::getContext();
 		$contextId = $context ? $context->getId() : CONTEXT_ID_NONE;
-		$plugin->updateSetting($contextId, 'heiMPT', $this->getData('heiMPT'));
+
+		$toolPath = $this->getData('toolPath');
+
+		if (!file_exists($toolPath)) {
+			import('classes.notification.NotificationManager');
+			$notificationMgr = new NotificationManager();
+			$request = Application::getRequest();
+			$notificationMgr->createTrivialNotification($request->getUser()->getId(),
+				NOTIFICATION_TYPE_ERROR, array('contents' => __('plugins.generic.heiMPT.tool.PathNotFound')));
+			return  false;
+		}
+		else {
+			$plugin->updateSetting($contextId, 'toolPath', $toolPath);
+			return true;
+		}
+
 	}
+
+	/**
+	 * @param $args
+	 * @param PKPRequest $request
+	 * @return mixed
+	 */
+
 	function manage($args, $request) {
 		$plugin = $this->getAuthorizedContextObject(ASSOC_TYPE_PLUGIN);
 		return $plugin->manage($args, $request);
 	}
 
+	/**
+	 * Fetchs template
+	 * @param PKPRequest $request
+	 * @return string
+	 */
 	function fetch($request) {
 		$templateMgr = TemplateManager::getManager($request);
 		return parent::fetch($request);
