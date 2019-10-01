@@ -40,14 +40,15 @@ class HeiMPTHandler extends Handler {
 
 		$output = '';
 		$returnCode = 0;
-		//run typestter
-		exec($typesetterCommand, $output, $returnCode);
 		$notificationMgr = new NotificationManager();
-		$successMsg = __('plugins.generic.heiMPT.tool.ConversionSuccess');
+
+		//run typesetter
+		exec($typesetterCommand, $output, $returnCode);
+
 		if ($returnCode > 0) {
-			$errorMsg = _('plugins.generic.heiMPT.tool.ConversionError');
+			$errorMsg = __('plugins.generic.heiMPT.tool.ConversionError');
 			$notificationMgr->createTrivialNotification($request->getUser()->getId(), NOTIFICATION_TYPE_ERROR, array('contents' => $errorMsg));
-			return new JSONMessage(false);
+
 		} else {
 			$submissionDao = Application::getSubmissionDAO();
 			$submissionId = $submissionFile->getSubmissionId();
@@ -85,7 +86,7 @@ class HeiMPTHandler extends Handler {
 
 			unlink($tmpfname);
 			rmdir($typesetterOutputPath);
-			$notificationMgr = new NotificationManager();
+			$successMsg = __('plugins.generic.heiMPT.tool.ConversionSuccess');
 			$notificationMgr->createTrivialNotification($user->getId(), NOTIFICATION_TYPE_SUCCESS, array('contents' => $successMsg));
 		}
 		return DAO::getDataChangedEvent();
