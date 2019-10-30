@@ -70,6 +70,8 @@ class HeiMPTHandler extends Handler {
 		//run typesetter
 		exec(escapeshellcmd($typesetterCommand), $output, $returnCode);
 
+
+
 		if ($returnCode > 0) {
 
 			$errorMsg = __('plugins.generic.heiMPT.tool.ConversionError');
@@ -77,6 +79,8 @@ class HeiMPTHandler extends Handler {
 
 		} else {
 
+
+			// create output file
 			$submissionDao = Application::getSubmissionDAO();
 			$submissionId = $submissionFile->getSubmissionId();
 			$submission = $submissionDao->getById($submissionId);
@@ -86,6 +90,7 @@ class HeiMPTHandler extends Handler {
 			import('plugins.generic.heiMPT.classes.JATSDocument');
 			$JATSDocument = new JATSDocument($fileContent);
 			$JATSDocument->setMeta($submission);
+			$JATSDocument->setImages($submission);
 
 			file_put_contents($tmpfname, $JATSDocument->saveXML());
 
@@ -110,9 +115,19 @@ class HeiMPTHandler extends Handler {
 			$newSubmissionFile->setSourceFileId($submissionFile->getFileId());
 			$newSubmissionFile->setSourceRevision($submissionFile->getRevision());
 			$newSubmissionFile->setRevision(1);
-			$submissionFileDao->insertObject($newSubmissionFile, $tmpfname);
+			$newSubmissionFile = $submissionFileDao->insertObject($newSubmissionFile, $tmpfname);
 
 			unlink($tmpfname);
+
+			// create dependent files
+			$mediaFilesPath = glob($typesetterOutputPath . DIRECTORY_SEPARATOR . 'media/*');
+
+			if (!empty($mediaFilesPath)) {
+				foreach ($mediaFilesPath as $filePath) {
+					$this->_attachSupplementaryFile($request, $submission, $submissionFileDao, $newSubmissionFile, $filePath);
+				}
+			}
+
 			$this->rrmdir($typesetterOutputPath);
 
 			$successMsg = __('plugins.generic.heiMPT.tool.ConversionSuccess');
@@ -143,5 +158,57 @@ class HeiMPTHandler extends Handler {
 		$typesetterCommand = 'python3 ' . $toolPath . ' --aggression 0 --nogit ' . $fileType . ' ' . $filePath . ' ' . $typesetterOutputPath;
 		return array($typesetterOutputPath, $convertedFile, $typesetterCommand);
 	}
+
+	/**
+	 * Adds attached images etc.
+	 *
+	 * @note Adapted from docxConverterPLlugin
+	 *
+	 * @param Request $request
+	 * @param Submission $submission
+	 * @param SubmissionFileDAO $submissionFileDao
+	 * @param SubmissionFile $newSubmissionFile
+	 * @param string $originalName
+	 * @param string $fileData
+	 */
+	private function _attachSupplementaryFile(Request $request, Submission $submission, SubmissionFileDAO $submissionFileDao, SubmissionFile $newSubmissionFile, $filePath) {
+
+		$tmpfnameSuppl = tempnam(sys_get_temp_dir(), $this->getPluginPath());
+		file_put_contents($tmpfnameSuppl, file_get_contents($filePath));
+		$mimeType = mime_content_type($filePath);
+
+		$genreDao = DAORegistry::getDAO('GenreDAO');
+		$genres = $genreDao->getByDependenceAndContextId(true, $request->getContext()->getId());
+		$supplGenreId = null;
+		while ($genre = $genres->next()) {
+			if (($mimeType == "image/png" || $mimeType == "image/jpeg") && $genre->getKey() == "IMAGE") {
+				$supplGenreId = $genre->getId();
+			}
+		}
+
+		if (!$supplGenreId) {
+			unlink($tmpfnameSuppl);
+			return;
+		}
+
+		// Set file
+		$supplementaryFile = $submissionFileDao->newDataObjectByGenreId($supplGenreId);
+		$supplementaryFile->setSubmissionId($submission->getId());
+		$supplementaryFile->setSubmissionLocale($submission->getLocale());
+		$supplementaryFile->setGenreId($supplGenreId);
+		$supplementaryFile->setFileStage(SUBMISSION_FILE_DEPENDENT);
+		$supplementaryFile->setDateUploaded(Core::getCurrentDate());
+		$supplementaryFile->setDateModified(Core::getCurrentDate());
+		$supplementaryFile->setUploaderUserId($request->getUser()->getId());
+		$supplementaryFile->setFileSize(filesize($tmpfnameSuppl));
+		$supplementaryFile->setFileType($mimeType);
+		$supplementaryFile->setAssocId($newSubmissionFile->getFileId());
+		$supplementaryFile->setAssocType(ASSOC_TYPE_SUBMISSION_FILE);
+		$supplementaryFile->setOriginalFileName(basename($filePath));
+
+		$submissionFileDao->insertObject($supplementaryFile, $tmpfnameSuppl);
+		unlink($tmpfnameSuppl);
+	}
+
 
 }
