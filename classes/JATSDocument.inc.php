@@ -23,6 +23,15 @@ class JATSDocument extends DOMDocument {
 		$this->xpath = new DOMXPath($this);
 	}
 
+	public function  setImages($submission) {
+		$media = $this->xpath->query("//graphic/@xlink:href");
+		foreach ($media as $mediaElement) {
+			$mediaElement->nodeValue = str_replace('media/','',$mediaElement->nodeValue);
+
+		}
+
+	}
+
 	/**
 	 * sets OJS metadata
 	 * @param $submission
