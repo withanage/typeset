@@ -68,6 +68,7 @@ class HeiMPTHandler extends Handler {
 			list($typesetterOutputPath, $convertedFile, $typesetterCommand) = $this->meTypeset($filePath, $userVars['fileExtension']);
 		}
 		else {
+
 			$errorMsg = __('plugins.generic.heiMPT.tool.ConversionError');
 			$notificationMgr->createTrivialNotification($request->getUser()->getId(), NOTIFICATION_TYPE_ERROR, array('contents' => $errorMsg));
 		}
@@ -79,10 +80,12 @@ class HeiMPTHandler extends Handler {
 		exec(escapeshellcmd($typesetterCommand), $output, $returnCode);
 
 		if ($returnCode > 0) {
+
 			$errorMsg = __('plugins.generic.heiMPT.tool.ConversionError');
 			$notificationMgr->createTrivialNotification($request->getUser()->getId(), NOTIFICATION_TYPE_ERROR, array('contents' => $errorMsg));
 
 		} else {
+
 			$submissionDao = Application::getSubmissionDAO();
 			$submissionId = $submissionFile->getSubmissionId();
 			$submission = $submissionDao->getById($submissionId);
