@@ -29,21 +29,54 @@ class HeiMPTHandler extends Handler {
 		return parent::authorize($request, $args, $roleAssignments);
 	}
 
+	/**
+	 * Delete folder and its contents
+	 * @note Adapted from https://www.php.net/manual/de/function.rmdir.php#117354
+	 */
+	function rrmdir($src) {
+		$dir = opendir($src);
+		while (false !== ($file = readdir($dir))) {
+			if (($file != '.') && ($file != '..')) {
+				$full = $src . '/' . $file;
+				if (is_dir($full)) {
+					$this->rrmdir($full);
+				} else {
+					unlink($full);
+				}
+			}
+		}
+		closedir($dir);
+		rmdir($src);
+	}
+
+	/**
+	 * @param Request $request
+	 * @param array $args
+	 * @return JSONMessage
+	 */
 	public function convert($args, $request) {
 
 		$user = $request->getUser();
 		$stageId = (int)$request->getUserVar('stageId');
 		$submissionFile = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION_FILE);
 		$filePath = $submissionFile->getFilePath();
+		$userVars = $request->getUserVars();
+		$notificationMgr = new NotificationManager();
 
-		list($typesetterOutputPath, $convertedFile, $typesetterCommand) = $this->runMeTypeset($filePath);
+		if (isset($userVars['fileExtension'])) {
+
+			list($typesetterOutputPath, $convertedFile, $typesetterCommand) = $this->meTypeset($filePath, $userVars['fileExtension']);
+		}
+		else {
+			$errorMsg = __('plugins.generic.heiMPT.tool.ConversionError');
+			$notificationMgr->createTrivialNotification($request->getUser()->getId(), NOTIFICATION_TYPE_ERROR, array('contents' => $errorMsg));
+		}
 
 		$output = '';
 		$returnCode = 0;
-		$notificationMgr = new NotificationManager();
 
 		//run typesetter
-		exec($typesetterCommand, $output, $returnCode);
+		exec(escapeshellcmd($typesetterCommand), $output, $returnCode);
 
 		if ($returnCode > 0) {
 			$errorMsg = __('plugins.generic.heiMPT.tool.ConversionError');
@@ -53,7 +86,7 @@ class HeiMPTHandler extends Handler {
 			$submissionDao = Application::getSubmissionDAO();
 			$submissionId = $submissionFile->getSubmissionId();
 			$submission = $submissionDao->getById($submissionId);
-			$tmpfname = tempnam(sys_get_temp_dir(), 'heiMPT');
+			$tmpfname = tempnam(sys_get_temp_dir(), basename($this->getPluginPath()));
 			$fileContent = file_get_contents($convertedFile);
 
 			import('plugins.generic.heiMPT.classes.JATSDocument');
@@ -68,6 +101,7 @@ class HeiMPTHandler extends Handler {
 			$originalFileInfo = pathinfo($submissionFile->getOriginalFileName());
 
 			$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
+
 			$newSubmissionFile = $submissionFileDao->newDataObjectByGenreId($genreId);
 			$newSubmissionFile->setSubmissionId($submission->getId());
 			$newSubmissionFile->setSubmissionLocale($submission->getLocale());
@@ -82,10 +116,11 @@ class HeiMPTHandler extends Handler {
 			$newSubmissionFile->setSourceFileId($submissionFile->getFileId());
 			$newSubmissionFile->setSourceRevision($submissionFile->getRevision());
 			$newSubmissionFile->setRevision(1);
-			$insertedSubmissionFile = $submissionFileDao->insertObject($newSubmissionFile, $tmpfname);
+			$submissionFileDao->insertObject($newSubmissionFile, $tmpfname);
 
 			unlink($tmpfname);
-			rmdir($typesetterOutputPath);
+			$this->rrmdir($typesetterOutputPath);
+
 			$successMsg = __('plugins.generic.heiMPT.tool.ConversionSuccess');
 			$notificationMgr->createTrivialNotification($user->getId(), NOTIFICATION_TYPE_SUCCESS, array('contents' => $successMsg));
 		}
@@ -93,16 +128,25 @@ class HeiMPTHandler extends Handler {
 	}
 
 	/**
-	 * typesets using meTypeset
-	 * @param $filePath
+	 * Override the builtin to get the correct plugin path.
+	 * @return string
+	 */
+	public function getPluginPath() {
+		return $this->_plugin->getPluginPath();
+	}
+
+	/**
+	 * typeset using meTypeset
+	 * @param $filePath source file path
+	 * @param $fileType source file type
 	 * @return array
 	 */
-	private function runMeTypeset($filePath) {
+	private function meTypeset($filePath, $fileType) {
 		$request = Application::getRequest();
 		$toolPath = $this->_plugin->getToolPath($request);
-		$typesetterOutputPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('heiMPT');
+		$typesetterOutputPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid(basename($this->getPluginPath()));
 		$convertedFile = $typesetterOutputPath . DIRECTORY_SEPARATOR . 'nlm' . DIRECTORY_SEPARATOR . 'out.xml';
-		$typesetterCommand = escapeshellcmd('python3 ' . $toolPath . ' --aggression 0 --nogit docx ' . $filePath . ' ' . $typesetterOutputPath);
+		$typesetterCommand = 'python3 ' . $toolPath . ' --aggression 0 --nogit ' . $fileType . ' ' . $filePath . ' ' . $typesetterOutputPath;
 		return array($typesetterOutputPath, $convertedFile, $typesetterCommand);
 	}
 

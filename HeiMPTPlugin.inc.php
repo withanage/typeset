@@ -72,14 +72,15 @@ class HeiMPTPlugin extends GenericPlugin {
 			if (is_array($data) && (isset($data['submissionFile']))) {
 				$submissionFile = $data['submissionFile'];
 				$fileExtension = strtolower($submissionFile->getExtension());
-				//TODO odt
-				if (strtolower($fileExtension) == 'docx') {
+
+				if ($fileExtension == 'docx' || $fileExtension == 'odt') {
 
 					$stageId = (int)$request->getUserVar('stageId');
-					$path = $dispatcher->url($request, ROUTE_PAGE, null, 'heiMPT', 'convert', null,
+					$path = $dispatcher->url($request, ROUTE_PAGE, null, basename($this->getPluginPath()), 'convert', null,
 						array(
 							'submissionId' => $submissionFile->getSubmissionId(),
 							'fileId' => $submissionFile->getFileId(),
+							'fileExtension' => $fileExtension,
 							'stageId' => $stageId
 						));
 					$pathRedirect = $dispatcher->url($request, ROUTE_PAGE, null, 'workflow', 'access',
