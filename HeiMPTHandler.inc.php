@@ -57,21 +57,12 @@ class HeiMPTHandler extends Handler {
 	public function convert($args, $request) {
 
 		$user = $request->getUser();
-		$stageId = (int)$request->getUserVar('stageId');
 		$submissionFile = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION_FILE);
 		$filePath = $submissionFile->getFilePath();
 		$userVars = $request->getUserVars();
 		$notificationMgr = new NotificationManager();
 
-		if (isset($userVars['fileExtension'])) {
-
-			list($typesetterOutputPath, $convertedFile, $typesetterCommand) = $this->meTypeset($filePath, $userVars['fileExtension']);
-		}
-		else {
-
-			$errorMsg = __('plugins.generic.heiMPT.tool.ConversionError');
-			$notificationMgr->createTrivialNotification($request->getUser()->getId(), NOTIFICATION_TYPE_ERROR, array('contents' => $errorMsg));
-		}
+		list($typesetterOutputPath, $convertedFile, $typesetterCommand) = $this->meTypeset($filePath, $userVars['fileExtension']);
 
 		$output = '';
 		$returnCode = 0;
