@@ -7,10 +7,12 @@ Currently supported:  [meTypeset](https://github.com/MartinPaulEve/meTypeset)
 
 For other command line tool integrations,  minor code is needed.  
 
+### Requirements
+* OJS 3.1.2 or later
+* [meTypeset](https://github.com/MartinPaulEve/meTypeset) 
+
+
 ### Installation 
-
-Install [meTypeset](https://github.com/MartinPaulEve/meTypeset) from the following repository.
-
 
 ```bash
 OJS_PATH=DEFINE_YOUR_OJS_PATH
