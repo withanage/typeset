@@ -1,9 +1,11 @@
 # OJS Typeset plugin
 ### Description
 
-Allows integration of a command line tool to initiate file conversion in OJS.
+Allows integration of a command line tool to execute file conversion  to XML in OJS.
 
-Currently supported:  [meTypeset](https://github.com/MartinPaulEve/meTypeset)
+Currently supported:  
+* Tools : [meTypeset](https://github.com/MartinPaulEve/meTypeset)
+* Formtats: DOCX/ODT -> JATS XML
 
 For other command line tool integrations,  minor code is needed.  
 
