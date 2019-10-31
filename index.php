@@ -1,12 +1,12 @@
 <?php
 
 /**
- * @file plugins/generic/heiMPT/index.php
+ * @file plugins/generic/typeset/index.php
  *
  */
 
-require_once('HeiMPTPlugin.inc.php');
+require_once('TypesetPlugin.inc.php');
 
-return new HeiMPTPlugin();
+return new TypesetPlugin();
 
 ?>

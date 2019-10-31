@@ -2,7 +2,7 @@
 <!DOCTYPE version SYSTEM "../../../lib/pkp/dtd/pluginVersion.dtd">
 
 <!--
- * @file plugins/generic/heiMPT/version.xml
+ * @file plugins/generic/typeset/version.xml
  *
  * Distributed under the GNU GPL v2.
  *
@@ -11,10 +11,10 @@
 -->
 
 <version>
-		<application>heiMPT</application>
+		<application>typeset</application>
 		<type>plugins.generic</type>
 		<release>0.0.0.1</release>
 		<date>2019-09-01</date>
 		<lazy-load>1</lazy-load>
-		<class>HeiMPTPlugin</class>
+		<class>TypesetPlugin</class>
 </version>

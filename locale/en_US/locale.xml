@@ -3,14 +3,14 @@
 
 
 <locale name="en_US" full_name="U.S. English">
-	<message key="plugins.generic.heiMPT.button.createXML">Create XML</message>
-	<message key="plugins.generic.heiMPT.description"><![CDATA[XML workflow creation Plugin for custom workflows. Currently supported tools: <a href="https://github.com/withanage/meTypeset.git" target="_self" title="meTypset">meTypset</a> ]]></message>
-	<message key="plugins.generic.heiMPT.displayName">heiMPT XML workflow tool</message>
-	<message key="plugins.generic.heiMPT.settings.description">Path to the commandline document conversion tool</message>
-	<message key="plugins.generic.heiMPT.settings.saved">Plugin settings saved</message>
-	<message key="plugins.generic.heiMPT.settings.title">Typesetting Tool Path</message>
-	<message key="plugins.generic.heiMPT.tool.ConversionError">Conversion error</message>
-	<message key="plugins.generic.heiMPT.tool.ConversionSuccess">Conversion successful</message>
-	<message key="plugins.generic.heiMPT.tool.PathNotFound">Tool path not found</message>
+	<message key="plugins.generic.typeset.button.createXML">Create XML</message>
+	<message key="plugins.generic.typeset.description"><![CDATA[Typeset XML workflow tool. Supports command line conversion tools. Currently supported : <a href="https://github.com/withanage/meTypeset.git" target="_self" title="meTypset">meTypset</a> ]]></message>
+	<message key="plugins.generic.typeset.displayName">Typeset XML workflow tool</message>
+	<message key="plugins.generic.typeset.settings.description">Path to the commandline document conversion tool</message>
+	<message key="plugins.generic.typeset.settings.saved">Plugin settings saved</message>
+	<message key="plugins.generic.typeset.settings.title">Typesetting Tool Path</message>
+	<message key="plugins.generic.typeset.tool.ConversionError">Conversion error</message>
+	<message key="plugins.generic.typeset.tool.ConversionSuccess">Conversion successful</message>
+	<message key="plugins.generic.typeset.tool.PathNotFound">Tool path not found</message>
 
 </locale>
