@@ -19,8 +19,8 @@
 
 	{fbvFormArea id="TypesetDisplayOptions" title="plugins.generic.typeset.settings.title"}
 
-		{fbvFormSection for="settingsDescription" description="plugins.generic.typeset.settings.description"}
-		{fbvElement type="text" id="toolPath" value=$toolPath size=$fbvStyles.size.LARGE inline=true required=true}
+		{fbvFormSection for="settingsAggression" description="plugins.generic.typeset.settings.aggression"}
+		{fbvElement type="text" id="toolPath" value=$toolAggression size=$fbvStyles.size.SMALL inline=true required=false}
 		{/fbvFormSection}
 
 

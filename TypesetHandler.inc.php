@@ -65,19 +65,14 @@ class TypesetHandler extends Handler {
 		list($typesetterOutputPath, $convertedFile, $typesetterCommand) = $this->meTypeset($filePath, $userVars['fileExtension']);
 
 		$output = '';
-		$returnCode = 0;
+		$returnCode = -1;
 
 		//run typesetter
-		exec(escapeshellcmd($typesetterCommand), $output, $returnCode);
+		if ($typesetterOutputPath != null) {
+			exec(escapeshellcmd($typesetterCommand), $output, $returnCode);
+		}
 
-
-		if ($returnCode > 0) {
-
-			$errorMsg = __('plugins.generic.typeset.tool.ConversionError');
-			$notificationMgr->createTrivialNotification($request->getUser()->getId(), NOTIFICATION_TYPE_ERROR, array('contents' => $errorMsg));
-
-		} else {
-
+		if ($returnCode == 0) {
 
 			// create output file
 			$submissionDao = Application::getSubmissionDAO();
@@ -131,7 +126,13 @@ class TypesetHandler extends Handler {
 
 			$successMsg = __('plugins.generic.typeset.tool.ConversionSuccess');
 			$notificationMgr->createTrivialNotification($user->getId(), NOTIFICATION_TYPE_SUCCESS, array('contents' => $successMsg));
+
+		} else {
+
+			$errorMsg = __('plugins.generic.typeset.tool.ConversionError ');
+			$notificationMgr->createTrivialNotification($request->getUser()->getId(), NOTIFICATION_TYPE_ERROR, array('contents' => $errorMsg));
 		}
+
 		return DAO::getDataChangedEvent();
 	}
 
@@ -152,10 +153,14 @@ class TypesetHandler extends Handler {
 	private function meTypeset($filePath, $fileType) {
 		$request = Application::getRequest();
 		$toolPath = $this->_plugin->getToolPath($request);
-		$typesetterOutputPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid(basename($this->getPluginPath()));
-		$convertedFile = $typesetterOutputPath . DIRECTORY_SEPARATOR . 'nlm' . DIRECTORY_SEPARATOR . 'out.xml';
-		$typesetterCommand = 'python3 ' . $toolPath . ' --aggression 0 --nogit ' . $fileType . ' ' . $filePath . ' ' . $typesetterOutputPath;
-		return array($typesetterOutputPath, $convertedFile, $typesetterCommand);
+		if (!file_exists($toolPath)) {
+			return;
+		} else {
+			$typesetterOutputPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid(basename($this->getPluginPath()));
+			$convertedFile = $typesetterOutputPath . DIRECTORY_SEPARATOR . 'nlm' . DIRECTORY_SEPARATOR . 'out.xml';
+			$typesetterCommand = 'python3 ' . $toolPath . ' --aggression 0 --nogit ' . $fileType . ' ' . $filePath . ' ' . $typesetterOutputPath;
+			return array($typesetterOutputPath, $convertedFile, $typesetterCommand);
+		}
 	}
 
 	/**

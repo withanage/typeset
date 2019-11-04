@@ -171,7 +171,7 @@ class TypesetPlugin extends GenericPlugin {
 	 */
 	function getToolPath($request) {
 		$context = $request->getContext();
-		$toolPath = $this->_getPluginSetting($context, 'toolPath');
+		$toolPath = Config::getVar('cli', 'meTypeset');
 		return $toolPath;
 	}
 
