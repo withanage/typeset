@@ -6,7 +6,7 @@
 	<message key="plugins.generic.typeset.button.createXML">Create XML</message>
 	<message key="plugins.generic.typeset.description"><![CDATA[Typeset XML workflow tool. Supports command line conversion tools. Currently supported : <a href="https://github.com/withanage/meTypeset.git" target="_self" title="meTypset">meTypset</a> ]]></message>
 	<message key="plugins.generic.typeset.displayName">Typeset XML workflow tool</message>
-	<message key="plugins.generic.typeset.settings.description">Path to the commandline document conversion tool</message>
+	<message key="plugins.generic.typeset.settings.aggression">Parser aggression level 0-10 [default: 10]</message>
 	<message key="plugins.generic.typeset.settings.saved">Plugin settings saved</message>
 	<message key="plugins.generic.typeset.settings.title">Typesetting Tool Path</message>
 	<message key="plugins.generic.typeset.tool.ConversionError">Conversion error</message>
