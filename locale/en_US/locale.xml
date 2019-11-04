@@ -8,7 +8,7 @@
 	<message key="plugins.generic.typeset.displayName">Typeset XML workflow tool</message>
 	<message key="plugins.generic.typeset.settings.aggression">Parser aggression level 0-10 [default: 10]</message>
 	<message key="plugins.generic.typeset.settings.saved">Plugin settings saved</message>
-	<message key="plugins.generic.typeset.settings.title">Typesetting Tool Path</message>
+	<message key="plugins.generic.typeset.settings.aggression">Aggression Level</message>
 	<message key="plugins.generic.typeset.tool.ConversionError">Conversion error</message>
 	<message key="plugins.generic.typeset.tool.ConversionSuccess">Conversion successful</message>
 	<message key="plugins.generic.typeset.tool.PathNotFound">Tool path not found</message>

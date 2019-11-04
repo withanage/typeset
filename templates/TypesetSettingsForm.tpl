@@ -17,10 +17,10 @@
 
 	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="TypesetFormNotification"}
 
-	{fbvFormArea id="TypesetDisplayOptions" title="plugins.generic.typeset.settings.title"}
+	{fbvFormArea id="TypesetDisplayOptions" title="plugins.generic.typeset.settings.aggression"}
 
 		{fbvFormSection for="settingsAggression" description="plugins.generic.typeset.settings.aggression"}
-		{fbvElement type="text" id="toolPath" value=$toolAggression size=$fbvStyles.size.SMALL inline=true required=false}
+		{fbvElement type="text" id="toolAgression" value=$toolAggression size=$fbvStyles.size.SMALL inline=true required=false}
 		{/fbvFormSection}
 
 
