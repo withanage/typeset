@@ -152,13 +152,23 @@ class TypesetHandler extends Handler {
 	 */
 	private function meTypeset($filePath, $fileType) {
 		$request = Application::getRequest();
-		$toolPath = $this->_plugin->getToolPath($request);
+		$context = $request->getContext();
+		$toolPath = $this->_plugin->getToolPath();
+
+		$aggression = $this->_plugin->_getPluginSetting($context, 'typesetToolAggression') ?: 0;
+		$clean = $this->_plugin->_getPluginSetting($context, 'typesetToolClean') ? ' --clean ' : '';
+		$noImage = $this->_plugin->_getPluginSetting($context, 'typesetToolImage') ? ' --noimageprocessing ' : '';
+		$noReference = $this->_plugin->_getPluginSetting($context, 'typesetToolReference')  ? ' --nolink ' : '';
+
+
+
+
 		if (!file_exists($toolPath)) {
 			return;
 		} else {
 			$typesetterOutputPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid(basename($this->getPluginPath()));
 			$convertedFile = $typesetterOutputPath . DIRECTORY_SEPARATOR . 'nlm' . DIRECTORY_SEPARATOR . 'out.xml';
-			$typesetterCommand = 'python3 ' . $toolPath . ' --aggression 0 --nogit ' . $fileType . ' ' . $filePath . ' ' . $typesetterOutputPath;
+			$typesetterCommand = 'python3 ' . $toolPath . ' --aggression ' . $aggression . ' --nogit ' . $clean .$noImage.$noReference. $fileType . ' ' . $filePath . ' ' . $typesetterOutputPath;
 			return array($typesetterOutputPath, $convertedFile, $typesetterCommand);
 		}
 	}

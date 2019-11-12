@@ -9,69 +9,54 @@ import('lib.pkp.classes.form.Form');
 
 //TODO
 
-class TypesetSettingsForm extends Form
-{
+class TypesetSettingsForm extends Form {
 
 	/**
 	 * TypesetForm constructor.
 	 * @param $plugin
 	 */
-	/***	 * @var context	 */
+	/***     * @var context */
 	private $_context;
 
 	/** @var Settings Plugin */
 	private $_plugin;
 
+	private $_pluginSettings;
+
 	function __construct($plugin, $contextId) {
 		$this->_context = $contextId;
 		$this->_plugin = $plugin;
+		$this->_pluginSettings  = ['typesetToolAggression','typesetToolClean','typesetToolImage','typesetToolReference'];
 
 		parent::__construct($plugin->getTemplateResource('TypesetSettingsForm.tpl'));
 		$this->setData('pluginName', $plugin->getName());
+
 	}
 
-	function initData()
-	{
-		$plugin = $this->_plugin;
-		$context = Request::getContext();
-		$contextId = $context ? $context->getId() : CONTEXT_ID_NONE;
-		$toolPath = $plugin->getSetting($contextId, 'toolPath');
-		if (isset($toolPath) & !empty($toolPath)) {
-			$this->setData('toolPath', $toolPath);
-		}
-		else {
-			$this->setData('toolPath', '');
-		}
+	private function _getPluginSettings() {
+		return $this->_pluginSettings;
 	}
 
-	function readInputData()
-	{
-		$this->readUserVars(array('toolPath'));
+	function initData() {
+
+		foreach ($this->_getPluginSettings() as $pluginSetting){
+		$this->_setValue($pluginSetting);
+		}
 	}
 
 	/**
 	 * @return
 	 */
-	function execute()
-	{
+	function execute() {
 		$plugin = $this->_plugin;
 		$context = Request::getContext();
 		$contextId = $context ? $context->getId() : CONTEXT_ID_NONE;
 
-		$toolPath = $this->getData('toolPath');
+		foreach ($this->_getPluginSettings() as $settingName) {
+			$plugin->updateSetting($contextId, $settingName, $this->getData($settingName));
+		}
 
-		if (!file_exists($toolPath)) {
-			import('classes.notification.NotificationManager');
-			$notificationMgr = new NotificationManager();
-			$request = Application::getRequest();
-			$notificationMgr->createTrivialNotification($request->getUser()->getId(),
-				NOTIFICATION_TYPE_ERROR, array('contents' => __('plugins.generic.typeset.tool.PathNotFound')));
-			return  false;
-		}
-		else {
-			$plugin->updateSetting($contextId, 'toolPath', $toolPath);
-			return true;
-		}
+		return true;
 
 	}
 
@@ -96,6 +81,26 @@ class TypesetSettingsForm extends Form
 		return parent::fetch($request);
 	}
 
+	/**
+	 * @param string $pluginSetting
+	 */
+	private function _setValue(string $pluginSetting): void {
+		$plugin = $this->_plugin;
+		$context = Request::getContext();
+		$contextId = $context ? $context->getId() : CONTEXT_ID_NONE;
+		$setting = $plugin->getSetting($contextId, $pluginSetting);
+		if (isset($setting) & !empty($setting)) {
+			$this->setData($pluginSetting, $setting);
+		}
+	}
+
+	/**
+	 * Assign form data to user-submitted data.
+	 */
+	function readInputData() {
+		parent::readInputData();
+		$this->readUserVars($this->_getPluginSettings());
+	}
 
 
 
