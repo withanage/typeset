@@ -6,21 +6,28 @@
  *
  *}
 <script type="text/javascript">
-	$(function() {ldelim}
+	$(function () {ldelim}
 		// Attach the form handler.
 		$('#TypesetForm').pkpHandler('$.pkp.controllers.form.AjaxFormHandler');
-	{rdelim});
+        {rdelim});
 </script>
 
 <form class="pkp_form" id="TypesetForm" method="post" action="{url op="manage" category="generic" plugin=$pluginName verb="save"}">
-	{csrf}
+    {csrf}
 
-	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="TypesetFormNotification"}
+    {include file="controllers/notification/inPlaceNotification.tpl" notificationId="TypesetFormNotification"}
 
-	{fbvFormArea id="TypesetDisplayOptions" title="plugins.generic.typeset.settings.aggression"}
-	{fbvFormSection for="settingsAggression" description="plugins.generic.typeset.settings.aggression"}
-	{fbvElement type="text" id="typesetToolAggression" value=$typesetToolAggression size=$fbvStyles.size.SMALL inline=true required=false}
-	{/fbvFormSection}
+
+    {fbvFormSection title="plugins.generic.typeset.settings.teiOutputTitle" list=true}
+    {fbvElement type="checkbox" id="typesetToolOutputTEI"   name="typesetToolOutputTEI" checked=$typesetToolOutputTEI label="plugins.generic.typeset.settings.teiOutputDescription"}
+    {/fbvFormSection}
+
+
+    {fbvFormArea id="TypesetDisplayOptions" title="plugins.generic.typeset.settings.aggression"}
+
+    {fbvFormSection for="settingsAggression" description="plugins.generic.typeset.settings.aggression"}
+    {fbvElement type="text" id="typesetToolAggression" value=$typesetToolAggression size=$fbvStyles.size.SMALL inline=true required=false}
+    {/fbvFormSection}
 
     {fbvFormSection title="plugins.generic.typeset.settings.cleanTitle" list=true}
     {fbvElement type="checkbox" name="typesetToolClean" id="typesetToolClean" checked=$typesetToolClean label="plugins.generic.typeset.settings.cleanDescription"}
@@ -35,5 +42,6 @@
     {/fbvFormSection}
 
     {/fbvFormArea}
+
 	{fbvFormButtons id="TypesetFormSubmit" submitText="common.save" hideCancel=true}
 </form>

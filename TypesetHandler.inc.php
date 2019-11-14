@@ -62,15 +62,13 @@ class TypesetHandler extends Handler {
 		$userVars = $request->getUserVars();
 		$notificationMgr = new NotificationManager();
 
-		list($typesetterOutputPath, $convertedFile, $typesetterCommand) = $this->meTypeset($filePath, $userVars['fileExtension']);
+		list($typesetterOutputPath, $convertedFile, $typesetterCommand, $outputXMLType) = $this->meTypeset($filePath, $userVars['fileExtension']);
 
 		$output = '';
 		$returnCode = -1;
 
 		//run typesetter
-		if ($typesetterOutputPath != null) {
-			exec(escapeshellcmd($typesetterCommand), $output, $returnCode);
-		}
+		exec(escapeshellcmd($typesetterCommand), $output, $returnCode);
 
 		if ($returnCode == 0) {
 
@@ -102,7 +100,7 @@ class TypesetHandler extends Handler {
 			$newSubmissionFile->setFileStage($submissionFile->getFileStage());
 			$newSubmissionFile->setDateUploaded(Core::getCurrentDate());
 			$newSubmissionFile->setDateModified(Core::getCurrentDate());
-			$newSubmissionFile->setOriginalFileName($originalFileInfo['filename'] . ".xml");
+			$newSubmissionFile->setOriginalFileName($originalFileInfo['filename'] .'-'.$outputXMLType. ".xml");
 			$newSubmissionFile->setUploaderUserId($user->getId());
 			$newSubmissionFile->setFileSize($fileSize);
 			$newSubmissionFile->setFileType("text/xml");
@@ -154,22 +152,26 @@ class TypesetHandler extends Handler {
 		$request = Application::getRequest();
 		$context = $request->getContext();
 		$toolPath = $this->_plugin->getToolPath();
+		$virtualPath = $this->_plugin->getPythonVM();
 
 		$aggression = $this->_plugin->_getPluginSetting($context, 'typesetToolAggression') ?: 0;
 		$clean = $this->_plugin->_getPluginSetting($context, 'typesetToolClean') ? ' --clean ' : '';
 		$noImage = $this->_plugin->_getPluginSetting($context, 'typesetToolImage') ? ' --noimageprocessing ' : '';
-		$noReference = $this->_plugin->_getPluginSetting($context, 'typesetToolReference')  ? ' --nolink ' : '';
-
-
+		$noReference = $this->_plugin->_getPluginSetting($context, 'typesetToolReference') ? ' --nolink ' : '';
+		$teiOutput = $this->_plugin->_getPluginSetting($context, 'typesetToolOutputTEI') ? ' --prettytei ' : '';
+		$outputXMLType = $teiOutput ? 'tei' : 'nlm';
 
 
 		if (!file_exists($toolPath)) {
 			return;
 		} else {
 			$typesetterOutputPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid(basename($this->getPluginPath()));
-			$convertedFile = $typesetterOutputPath . DIRECTORY_SEPARATOR . 'nlm' . DIRECTORY_SEPARATOR . 'out.xml';
-			$typesetterCommand = 'python3 ' . $toolPath . ' --aggression ' . $aggression . ' --nogit ' . $clean .$noImage.$noReference. $fileType . ' ' . $filePath . ' ' . $typesetterOutputPath;
-			return array($typesetterOutputPath, $convertedFile, $typesetterCommand);
+			$convertedFile = $typesetterOutputPath . DIRECTORY_SEPARATOR . $outputXMLType . DIRECTORY_SEPARATOR . 'out.xml';
+			$typesetterCommand = $virtualPath . 'python3 ' . $toolPath . ' --aggression ' . $aggression . ' --nogit ' . $clean . $noImage . $noReference . $teiOutput . $fileType . ' ' . $filePath . ' ' . $typesetterOutputPath;
+
+			if($outputXMLType == 'nlm')  $outputXMLType = 'jats';
+
+			return array($typesetterOutputPath, $convertedFile, $typesetterCommand, $outputXMLType);
 		}
 	}
 

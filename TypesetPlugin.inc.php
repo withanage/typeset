@@ -166,12 +166,22 @@ class TypesetPlugin extends GenericPlugin {
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
 	function getToolPath() {
 		$toolPath = Config::getVar('cli', 'meTypeset');
 		return $toolPath;
 	}
+
+	/**
+	 * Get python virtual environment
+	 * @return string
+	 */
+	function getPythonVM() {
+		$toolPath = Config::getVar('cli', 'python_vm');
+		return $toolPath;
+	}
+
 
 	/**
 	 * @param array $args

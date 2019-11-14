@@ -13,6 +13,9 @@
 	<message key="plugins.generic.typeset.settings.imageDescription">Disable unoconv image processing</message>
 	<message key="plugins.generic.typeset.settings.referenceTitle">Disable reference linking</message>
 	<message key="plugins.generic.typeset.settings.referenceDescription">  Do not run reference linker</message>
+	<message key="plugins.generic.typeset.settings.virtualPath"> If python is installed in a virtaul path, please define, Full path</message>
+	<message key="plugins.generic.typeset.settings.teiOutputTitle"> Create Output type TEI XML</message>
+	<message key="plugins.generic.typeset.settings.teiOutputDescription"> Stops after performing TEI XSLT step</message>
 	<message key="plugins.generic.typeset.settings.saved">Plugin settings saved</message>
 	<message key="plugins.generic.typeset.tool.ConversionError">Conversion error</message>
 	<message key="plugins.generic.typeset.tool.ConversionSuccess">Conversion successful</message>

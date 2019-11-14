@@ -23,10 +23,13 @@ cd $OJS_PATH/plugins/generic
 git clone https://github.com/withanage/typeset 
 
 # Add meTypeset in cofig.inc.php under [cli] section
-; meTypeet path
+; meTypeset path
 meTypeset = /home/withanage/software/meTypset/bin/meTypeset.py
 
+# Only if necessary, Add a python3 virtual environment path
+python_vm= /home/withanage/python_vm 
 ```
+
 #### Settings configuration
 ```bash
 # Add tool path e.g. (usr/local/meTypset/bin/meTypset.py) under  

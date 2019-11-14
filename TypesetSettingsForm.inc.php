@@ -26,7 +26,14 @@ class TypesetSettingsForm extends Form {
 	function __construct($plugin, $contextId) {
 		$this->_context = $contextId;
 		$this->_plugin = $plugin;
-		$this->_pluginSettings  = ['typesetToolAggression','typesetToolClean','typesetToolImage','typesetToolReference'];
+		$this->_pluginSettings = [
+			'typesetToolAggression',
+			'typesetToolClean',
+			'typesetToolImage',
+			'typesetToolReference',
+			'typesetPythonVirtualPath',
+			'typesetToolOutputTEI'
+		];
 
 		parent::__construct($plugin->getTemplateResource('TypesetSettingsForm.tpl'));
 		$this->setData('pluginName', $plugin->getName());
@@ -101,7 +108,5 @@ class TypesetSettingsForm extends Form {
 		parent::readInputData();
 		$this->readUserVars($this->_getPluginSettings());
 	}
-
-
 
 }
