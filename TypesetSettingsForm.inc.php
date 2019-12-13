@@ -91,7 +91,7 @@ class TypesetSettingsForm extends Form {
 	/**
 	 * @param string $pluginSetting
 	 */
-	private function _setValue(string $pluginSetting): void {
+	private function _setValue(string $pluginSetting) {
 		$plugin = $this->_plugin;
 		$context = Request::getContext();
 		$contextId = $context ? $context->getId() : CONTEXT_ID_NONE;
