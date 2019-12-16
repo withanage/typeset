@@ -154,7 +154,7 @@ class TypesetHandler extends Handler {
 		$toolPath = $this->_plugin->getToolPath();
 		$virtualPath = $this->_plugin->getPythonVM();
 
-		$aggression = $this->_plugin->_getPluginSetting($context, 'typesetToolAggression') ?: 0;
+		$aggression = $this->_plugin->_getPluginSetting($context, 'typesetToolAggression') ?: 5;
 		$clean = $this->_plugin->_getPluginSetting($context, 'typesetToolClean') ? ' --clean ' : '';
 		$noImage = $this->_plugin->_getPluginSetting($context, 'typesetToolImage') ? ' --noimageprocessing ' : '';
 		$noReference = $this->_plugin->_getPluginSetting($context, 'typesetToolReference') ? ' --nolink ' : '';
