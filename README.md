@@ -4,14 +4,14 @@
 Allows integration of a command line tool to execute file conversion  to XML in OJS.
 
 Currently supported:  
-* Tools : [meTypeset](https://github.com/MartinPaulEve/meTypeset)
+* Tools : [meTypeset](https://github.com/withanage/meTypeset)
 * Formats: DOCX/ODT -> JATS XML
 
 For other command line tool integrations,  minor code is needed.  
 
 ### Requirements
 * OJS 3.1.2 or later
-* [meTypeset](https://github.com/MartinPaulEve/meTypeset) 
+* [meTypeset](https://github.com/withanage/meTypeset) 
 
 
 ### Installation 
