@@ -33,6 +33,7 @@ class TypesetPlugin extends GenericPlugin {
 		return $success;
 	}
 
+
 	//Callbacks
 
 	/**
@@ -44,10 +45,13 @@ class TypesetPlugin extends GenericPlugin {
 		$page = $args[0];
 		$op = $args[1];
 
-		if ($page == "typeset" && $op == "convert") {
-			define('HANDLER_CLASS', 'TypesetHandler');
-			define('TYPESET_PLUGIN_NAME', $this->getName());
-			$args[2] = $this->getPluginPath() . '/' . 'TypesetHandler.inc.php';
+		switch ("$page/$op") {
+			case 'typeset/createGalley':
+			case 'typeset/createGalleyForm':
+			case 'typeset/convert':
+				define('HANDLER_CLASS', 'TypesetHandler');
+				define('TYPESET_PLUGIN_NAME', $this->getName());
+				$args[2] = $this->getPluginPath() . '/' . 'TypesetHandler.inc.php';
 		}
 
 		return false;
@@ -68,40 +72,67 @@ class TypesetPlugin extends GenericPlugin {
 
 			$row = $templateMgr->get_template_vars('row');
 			$data = $row->getData();
+			$stageId = (int)$request->getUserVar('stageId');
 
-			if (is_array($data) && (isset($data['submissionFile']))) {
-				$submissionFile = $data['submissionFile'];
-				$fileExtension = strtolower($submissionFile->getExtension());
+			if ($stageId == WORKFLOW_STAGE_ID_PRODUCTION) {
+				if (is_array($data) && (isset($data['submissionFile']))) {
+					$submissionFile = $data['submissionFile'];
+					$fileExtension = strtolower($submissionFile->getExtension());
 
-				if ($fileExtension == 'docx' || $fileExtension == 'odt') {
+					if ($fileExtension == 'docx' || $fileExtension == 'odt') {
 
-					$stageId = (int)$request->getUserVar('stageId');
-					$path = $dispatcher->url($request, ROUTE_PAGE, null, basename($this->getPluginPath()), 'convert', null,
-						array(
+						$path = $dispatcher->url($request, ROUTE_PAGE, null, basename($this->getPluginPath()), 'convert', null,
+							array(
+								'submissionId' => $submissionFile->getSubmissionId(),
+								'fileId' => $submissionFile->getFileId(),
+								'fileExtension' => $fileExtension,
+								'stageId' => $stageId
+							));
+						$pathRedirect = $dispatcher->url($request, ROUTE_PAGE, null, 'workflow', 'access',
+							array(
+								'submissionId' => $submissionFile->getSubmissionId(),
+								'fileId' => $submissionFile->getFileId(),
+								'stageId' => $stageId
+							));
+
+						import('lib.pkp.classes.linkAction.request.AjaxAction');
+						$linkAction = new LinkAction(
+							'parse',
+							new PostAndRedirectAction($path, $pathRedirect),
+							__('plugins.generic.typeset.button.createXML')
+						);
+						$row->addAction($linkAction);
+					}
+
+					$pluginSettingsDao = DAORegistry::getDAO('PluginSettingsDAO');
+					$context = $request->getContext();
+					if (!$pluginSettingsDao->settingExists($context->getId(), 'texture', 'enabled')) {
+
+						$actionArgs = array(
 							'submissionId' => $submissionFile->getSubmissionId(),
-							'fileId' => $submissionFile->getFileId(),
-							'fileExtension' => $fileExtension,
-							'stageId' => $stageId
+							'stageId' => $stageId,
+							'fileId' => $submissionFile->getFileId()
+						);
+						import('lib.pkp.classes.linkAction.request.AjaxAction');
+						$row->addAction(new LinkAction(
+							'createGalleyForm',
+							new AjaxModal(
+								$dispatcher->url(
+									$request, ROUTE_PAGE, null,
+									'typeset',
+									'createGalleyForm', null,
+									$actionArgs
+								),
+								__('submission.layout.newGalley')
+							),
+							__('plugins.generic.typeset.links.createGalley'),
+							null
 						));
-					$pathRedirect = $dispatcher->url($request, ROUTE_PAGE, null, 'workflow', 'access',
-						array(
-							'submissionId' => $submissionFile->getSubmissionId(),
-							'fileId' => $submissionFile->getFileId(),
-							'stageId' => $stageId
-						));
-
-					import('lib.pkp.classes.linkAction.request.AjaxAction');
-					$linkAction = new LinkAction(
-						'parse',
-						new PostAndRedirectAction($path, $pathRedirect),
-						__('plugins.generic.typeset.button.createXML')
-					);
-					$row->addAction($linkAction);
+					}
 				}
 			}
 		}
 	}
-
 
 	/**
 	 * @copydoc Plugin::getActions()
@@ -214,5 +245,6 @@ class TypesetPlugin extends GenericPlugin {
 		}
 		return parent::manage($args, $request);
 	}
+
 
 }

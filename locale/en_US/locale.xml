@@ -20,5 +20,6 @@
 	<message key="plugins.generic.typeset.tool.ConversionError">Conversion error</message>
 	<message key="plugins.generic.typeset.tool.ConversionSuccess">Conversion successful</message>
 	<message key="plugins.generic.typeset.tool.PathNotFound">Tool path not found</message>
+	<message key="plugins.generic.typeset.links.createGalley">Create Galley</message>
 
 </locale>

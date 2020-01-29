@@ -13,7 +13,7 @@ class TypesetHandler extends Handler {
 		$this->_plugin = PluginRegistry::getPlugin('generic', TYPESET_PLUGIN_NAME);
 		$this->addRoleAssignment(
 			array(ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR, ROLE_ID_ASSISTANT, ROLE_ID_AUTHOR),
-			array('convert')
+			array('convert','createGalley','createGalleyForm')
 		);
 	}
 
@@ -29,11 +29,61 @@ class TypesetHandler extends Handler {
 		return parent::authorize($request, $args, $roleAssignments);
 	}
 
+
+
+	/**
+	 * Create galley form
+	 * @param $args array
+	 * @param $request PKPRequest
+	 * @return JSONMessage JSON object
+	 */
+	public function createGalleyForm($args, $request) {
+
+		import('plugins.generic.typeset.controllers.grid.form.TypesetArticleGalleyForm');
+		$galleyForm = new TypesetArticleGalleyForm(
+			$request,
+			$this->getPlugin(),
+			$this->getSubmission()
+		);
+
+		$galleyForm->initData();
+		return new JSONMessage(true, $galleyForm->fetch($request));
+	}
+
+	/**
+	 * @param $args
+	 * @param $request PKPRequest
+	 * @return JSONMessage
+	 */
+	public function createGalley($args, $request) {
+
+		import('plugins.generic.typeset.controllers.grid.form.TypesetArticleGalleyForm');
+
+		$galleyForm = new TypesetArticleGalleyForm($request, $this->getPlugin(), $this->getSubmission());
+		$galleyForm->readInputData();
+
+		if ($galleyForm->validate()) {
+
+			$galleyForm->execute();
+
+			return $request->redirectUrlJson($request->getDispatcher()->url($request, ROUTE_PAGE, null, 'workflow', 'access', null,
+				array(
+					'submissionId' => $request->getUserVar('submissionId'),
+					'stageId' => $request->getUserVar('stageId')
+				)
+			));
+
+		}
+
+		return new JSONMessage(false);
+	}
+
+
 	/**
 	 * Delete folder and its contents
 	 * @note Adapted from https://www.php.net/manual/de/function.rmdir.php#117354
 	 */
-	function rrmdir($src) {
+	private function rrmdir($src) {
 		$dir = opendir($src);
 		while (false !== ($file = readdir($dir))) {
 			if (($file != '.') && ($file != '..')) {
@@ -226,4 +276,19 @@ class TypesetHandler extends Handler {
 	}
 
 
+	/**
+	 * Get the plugin.
+	 * @return TypesetPlugin
+	 */
+	function getPlugin() {
+		return $this->_plugin;
+	}
+
+	/**
+	 * Get the submission associated with this grid.
+	 * @return Submission
+	 */
+	function getSubmission() {
+		return $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
+	}
 }
