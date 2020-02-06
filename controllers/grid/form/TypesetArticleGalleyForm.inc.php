@@ -29,7 +29,7 @@ class TypesetArticleGalleyForm extends Form {
 	function __construct($request, $plugin, $submission) {
 		$this->_submission = $submission;
 
-		parent::__construct($plugin->getTemplateResource('TypesetArticleGalley.tpl'));
+		parent::__construct($plugin->getTemplatePath().'TypesetArticleGalley.tpl');
 
 		AppLocale::requireComponents(LOCALE_COMPONENT_APP_EDITOR, LOCALE_COMPONENT_PKP_SUBMISSION);
 

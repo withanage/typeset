@@ -74,13 +74,13 @@ class JATSDocument extends DOMDocument {
 					$name = $this->createElement("name");
 					$contrib->appendChild($name);
 
-					if ($author->getLocalizedFamilyName()) {
-						$surname = $this->createElement("surname", htmlspecialchars($author->getLocalizedFamilyName()));
-						$name->appendChild($surname);
+					if ($author->getLastName()) {
+						$lastName = $this->createElement("lastName", htmlspecialchars($author->getLastName()));
+						$name->appendChild($lastName);
 					}
 
-					$givenNames = $this->createElement("given-names", htmlspecialchars($author->getLocalizedGivenName()));
-					$name->appendChild($givenNames);
+					$firstName = $this->createElement("firstName", htmlspecialchars($author->getFirstName()));
+					$name->appendChild($firstName);
 
 					if ($author->getEmail()) {
 						$email = $this->createElement("email", htmlspecialchars($author->getEmail()));

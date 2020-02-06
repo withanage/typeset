@@ -106,7 +106,7 @@ class TypesetPlugin extends GenericPlugin {
 
 					$pluginSettingsDao = DAORegistry::getDAO('PluginSettingsDAO');
 					$context = $request->getContext();
-					if (!$pluginSettingsDao->settingExists($context->getId(), 'texture', 'enabled')) {
+					if (!$pluginSettingsDao->settingExists($context->getId(), 'texture', 'enabled') && false) {
 
 						$actionArgs = array(
 							'submissionId' => $submissionFile->getSubmissionId(),

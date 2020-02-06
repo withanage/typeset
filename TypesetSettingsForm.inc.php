@@ -35,7 +35,7 @@ class TypesetSettingsForm extends Form {
 			'typesetToolOutputTEI'
 		];
 
-		parent::__construct($plugin->getTemplateResource('TypesetSettingsForm.tpl'));
+		parent::__construct($plugin->getTemplatePath() . '/templates/TypesetSettingsForm.tpl');
 		$this->setData('pluginName', $plugin->getName());
 
 	}
